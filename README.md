@@ -18,7 +18,6 @@ python main.py -p (accidents, infractions) -i (file.csv)
 
 ## References
 
-* 
 * [PRF](https://www.prf.gov.br/portal/dados-abertos/) - Brazil PRF open data
 
 ## License
