@@ -5,8 +5,8 @@ import argparse
 
 # Local imports
 from constants import MAIN_DESC, INPUT_DESC, POPULATE_DESC
-from models import DB
-from utils import populate
+from models import DB, Graph
+from utils import make_graph, populate
 
 
 def main():
@@ -17,8 +17,10 @@ def main():
     args = parser.parse_args()
     try:
         db = DB()
+        graph = Graph()
         if args.populate and args.input:
             populate(args.populate, args.input, db)
+        make_graph(graph, db)
     except Exception as e:
         print(e)
         parser.print_help()

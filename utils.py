@@ -5,6 +5,10 @@ import codecs
 import csv
 import sys
 
+# Local imports
+from config import DB_COLLECTIONS
+from models import Graph, Node
+
 
 def read_csv(file_path):
     """Read CSV file."""
@@ -26,3 +30,14 @@ def populate(collection, file_path, db):
             document.update({header[index]: line[index]})
         data.append(document)
     db.insert(data, collection)
+
+
+def make_graph(graph, db):
+    data = {}
+    for key, values in DB_COLLECTIONS.items():
+        data[key] = db.find({}, values, key)
+    for accident in data["accidents"]:
+        graph.add_node(accident["br"], accident["km"], Node())
+    # for infraction in data["infractions"]:
+    #     graph.add_node(infraction["num_br_infracao"], infraction["num_km_infracao"], Node())
+    # print(graph.nodes)
