@@ -32,12 +32,29 @@ def populate(collection, file_path, db):
     db.insert(data, collection)
 
 
+### METODO 1 ###
 def make_graph(graph, db):
+    """Make traffic occurrence graph."""
     data = {}
     for key, values in DB_COLLECTIONS.items():
         data[key] = db.find({}, values, key)
     for accident in data["accidents"]:
         graph.add_node(accident["br"], accident["km"], Node())
-    # for infraction in data["infractions"]:
-    #     graph.add_node(infraction["num_br_infracao"], infraction["num_km_infracao"], Node())
-    # print(graph.nodes)
+    for infraction in data["infractions"]:
+        graph.add_node(infraction["num_br_infracao"], infraction["num_km_infracao"], Node())
+    print(graph.nodes)
+
+### METODO 2 ###
+# def make_graph(graph, db):
+#     """Make traffic occurrence graph."""
+#     data = {}
+#     for key, values in DB_COLLECTIONS.items():
+#         data[key] = db.find({}, values, key)
+#     for accident in data["accidents"]:
+#         br = graph.add_br(accident["br"])
+#         br.add_km(accident["km"])
+#     for infraction in data["infractions"]:
+#         br = graph.add_br(infraction["num_br_infracao"])
+#         br.add_km(infraction["num_km_infracao"])
+#     for br in graph.brs:
+#         print(br.id)
