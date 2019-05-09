@@ -3,11 +3,12 @@
 # System imports
 import codecs
 import csv
+import os
 import sys
 
 # Local imports
-from config import DB_COLLECTIONS
-from models import Graph, Node
+from config import DB_COLLECTIONS, DB_SEPARATOR, FILES_FOLDER, FILES_SEPARATOR
+from models import Event
 
 
 def read_csv(file_path):
@@ -20,41 +21,55 @@ def read_csv(file_path):
     return header, lines
 
 
-def populate(collection, file_path, db):
+def populate(year, db):
     """Populate database with a file."""
-    header, lines = read_csv(file_path)    
-    data = []
-    for line in lines:
-        document = {}
-        for index in range(0, len(header)):
-            document.update({header[index]: line[index]})
-        data.append(document)
-    db.insert(data, collection)
-
-
-### METODO 1 ###
-def make_graph(graph, db):
-    """Make traffic occurrence graph."""
-    data = {}
     for key, values in DB_COLLECTIONS.items():
-        data[key] = db.find({}, values, key)
-    for accident in data["accidents"]:
-        graph.add_node(accident["br"], accident["km"], Node())
-    for infraction in data["infractions"]:
-        graph.add_node(infraction["num_br_infracao"], infraction["num_km_infracao"], Node())
-    print(graph.nodes)
+        path = FILES_FOLDER + year + FILES_SEPARATOR + key
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        for file in files:
+            header, lines = read_csv(path + FILES_SEPARATOR + file)
+            data = []
+            for line in lines:
+                document = {}
+                for index in range(0, len(header)):
+                    document.update({header[index]: line[index]})
+                data.append(document)
+            db.insert(data, year+DB_SEPARATOR+key)
 
-### METODO 2 ###
-# def make_graph(graph, db):
-#     """Make traffic occurrence graph."""
-#     data = {}
-#     for key, values in DB_COLLECTIONS.items():
-#         data[key] = db.find({}, values, key)
-#     for accident in data["accidents"]:
-#         br = graph.add_br(accident["br"])
-#         br.add_km(accident["km"])
-#     for infraction in data["infractions"]:
-#         br = graph.add_br(infraction["num_br_infracao"])
-#         br.add_km(infraction["num_km_infracao"])
-#     for br in graph.brs:
-#         print(br.id)
+
+def construct(year, db):
+    """Make traffic occurrence graph."""
+
+    def add(events, br, km, event):
+        """Insert an event in events dict."""
+        if not br in events:
+            events[br] = {}
+        if not km in events[br]:
+            events[br][km] = {}
+        for key, values in event.items():
+            if not key in events[br][km]:
+                events[br][km][key] = 0
+            value = events[br][km][key] + event[key]
+            events[br][km].update({key: value})
+
+    data = {}
+    events = {}
+    for key, values in DB_COLLECTIONS.items():
+        data[key] = db.find({}, values, year+DB_SEPARATOR+key)
+    for accident in data["accidents"]:
+        event = {"accidents": 1,
+                 "deaths": int(accident["mortos"])}
+        add(events, accident["br"], accident["km"].split(".")[0], event)
+    for infraction in data["infractions"]:
+        event = {"infractions": 1}
+        add(events, infraction["num_br_infracao"], infraction["num_km_infracao"].split(".")[0], event)
+    db.insert(events, year+DB_SEPARATOR+"data")
+
+
+def run(method, year, db):
+    """Run method."""
+    switcher = {
+        "populate": lambda: populate(year, db),
+        "construct": lambda: construct(year, db)
+    }
+    return switcher.get(method)()

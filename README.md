@@ -7,7 +7,13 @@ The TOA is a simple strategy created to find patterns in traffic occurrences.
 * Populate mongo database:
 
 ```
-python main.py -p (accidents, infractions) -i (file.csv)
+python main.py -m populate -y <year>
+```
+
+* Construct data:
+
+```
+python main.py -m construct -y <year>
 ```
 
 ## Authors
