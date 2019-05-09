@@ -21,13 +21,7 @@ class Database():
             self.db[collection].insert_many(data)
         else:
             self.db[collection].insert_one(data)
- 
+
     def find(self, query, fields, collection):
         """Find data."""
         return self.db[collection].find(query, fields)
-
-class Event():
-    """Class to manage Event model."""
-
-    def __init__(self):
-        """Create a new Event Instance."""

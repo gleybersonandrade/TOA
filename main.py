@@ -6,7 +6,7 @@ import argparse
 # Local imports
 from constants import MAIN_DESC, METHOD_DESC, YEAR_DESC
 from models import Database
-from utils import construct, populate, run
+from utils import run
 
 
 def main():
