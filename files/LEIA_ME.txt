@@ -1,0 +1,18 @@
+# Mudanças realizadas
+
+> Codificação dos caracteres foi alterada(utf-8) para o handler exibir todos os caracteres.
+> Coluna de id dos acidentes foi refeita em cada csv
+> Atributos nulos foram removidos somente na base de acidentes, se fosse feito na base
+de infrações seriam perdidos todos os dados, cada linha do csv tem pelo menos um atributo
+null.
+> As datas foram todas corrigidas e em todas as bases seguem somente um formato.
+Somente as datas nos atributos data_inversa em acidentes e dat_infracao em infracoes.
+> Foram removidos 78 registros de acidentes dos quais tinham coordenadas fora do Brasil.
+> Foram removidos todos os espaços em branco em excesso de todos os atributos.
+> Foram removidas todas as aspas duplas.
+> Caractere de separação de atributos em todas as bases é o ';'
+> As bases de infrações continuam não tendo id.
+> Foi removida a coluna 'ano' de todas as bases de acidentes que possuiam este atributo
+
+
+Meu pc não aguentou unir as bases de infrações kkk.

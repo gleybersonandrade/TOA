@@ -4,6 +4,7 @@
 import codecs
 import csv
 import os
+import re
 
 # Local imports
 from config import DB_COLLECTIONS, DB_SEPARATOR, FILES_FOLDER, FILES_SEPARATOR
@@ -12,7 +13,7 @@ from config import DB_COLLECTIONS, DB_SEPARATOR, FILES_FOLDER, FILES_SEPARATOR
 def read_csv(path):
     """Read CSV file."""
     with codecs.open(path, 'r', encoding="utf-8", errors="ignore") as file:
-        reader = csv.reader(file)
+        reader = csv.reader(file, delimiter=';')
         header = next(reader, None)
         lines = [line for line in reader]
         file.close()
@@ -57,11 +58,12 @@ def construct(year, db):
     for accident in data["accidents"]:
         event = {"accidents": 1,
                  "deaths": int(accident["mortos"])}
-        add(events, accident["br"], accident["km"].split(".")[0], event)
+        add(events, re.split('[,|.]', accident["br"])[0],
+            re.split('[,|.]', accident["km"])[0], event)
     for infraction in data["infractions"]:
         event = {"infractions": 1}
-        add(events, infraction["num_br_infracao"],
-            infraction["num_km_infracao"].split(".")[0], event)
+        add(events, re.split('[,|.]', infraction["num_br_infracao"])[0],
+            re.split('[,|.]', infraction["num_km_infracao"])[0], event)
     db.insert(events, year+DB_SEPARATOR+"data")
 
 
