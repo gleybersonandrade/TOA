@@ -5,7 +5,6 @@ import argparse
 
 # Local imports
 from constants import MAIN_DESC, METHOD_DESC
-from models import Database
 from utils import run
 
 
@@ -15,9 +14,8 @@ def main():
     parser.add_argument('-m', '--method', help=METHOD_DESC)
     args = parser.parse_args()
     try:
-        db = Database()
         if args.method:
-            run(args.method, db)
+            run(args.method)
     except Exception as e:
         print(e)
         parser.print_help()

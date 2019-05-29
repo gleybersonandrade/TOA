@@ -1,13 +1,13 @@
 """Traffic Occurrence Analyzer config."""
 
-DB_HOST = "localhost"
-DB_PORT = 27017
-DB_NAME = "toa"
-
-DB_COLLECTIONS = {"accidents": {"br", "km", "mortos"},
-                  "infractions": {"num_br_infracao", "num_km_infracao"}}
+GM_API_KEY = "secret"
+GM_LAT = -15.135
+GM_LEN = -51.9253
+GM_ZOOM = 5
 
 FILES_FOLDER = "files/"
-FILES_SEPARATOR = "/"
 
-YEARS = ["2016", "2017", "2018"]
+COLLECTIONS = {"accidents": {"br", "km", "mortos"},
+               "infractions": {"num_br_infracao", "num_km_infracao"}}
+
+YEARS = ["2015", "2016", "2017", "2018"]

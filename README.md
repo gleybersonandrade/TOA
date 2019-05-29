@@ -4,16 +4,22 @@ The TOA is a simple strategy created to find patterns in traffic occurrences.
 
 ## Running
 
-* Populate mongo database:
+* Generate input json files:
 
 ```
-python main.py -m populate
+python main.py -m generate
 ```
 
-* Construct data:
+* Construct file to be used by graph:
 
 ```
 python main.py -m construct
+```
+
+* Execute main method:
+
+```
+python main.py -m execute
 ```
 
 ## Authors
