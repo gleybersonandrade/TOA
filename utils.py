@@ -59,7 +59,7 @@ def generate():
             path = FILES_FOLDER + year + '/' + key
             files = [f for f in os.listdir(path)
                      if os.path.isfile(os.path.join(path, f))]
-            file_data = []
+            f_data = []
             for file in files:
                 header, lines = read_csv(path + '/' + file)
                 for line in lines:
@@ -67,8 +67,8 @@ def generate():
                     for index, field in enumerate(header):
                         if field in values:
                             document.update({field: line[index]})
-                    file_data.append(document)
-            data[key] = file_data
+                    f_data.append(document)
+            data[key] = f_data
         return data
 
     for year in YEARS:
@@ -100,9 +100,9 @@ def construct():
         if km not in data[br]:
             data[br][km] = {}
         accidents = events.get("accidents") or 0
-        fatal_accidents = events.get("fatal_accidents") or 0
+        deaths = events.get("deaths") or 0
         infractions = events.get("infractions") or 1
-        critical = round((3*fatal_accidents + accidents + 0.1*infractions), 3)
+        critical = round((3 * deaths + accidents + 0.1 * infractions), 3)
         events.update({"critical": critical})
         current_critical = data[br][km].get("critical") or 0
         data[br][km][year] = events
@@ -110,38 +110,40 @@ def construct():
                                          (int(YEARS[-1])-int(year)+1), 3)
 
     data = {}
-    for year in YEARS:
-        file_data = read_json(FILES_FOLDER + year + '/out.json')
-        for br, kms in file_data.items():
-            for km, events in kms.items():
-                add(data, br, km, year, events)
-    save_json(data, FILES_FOLDER + '/out.json')
+    f_data = read_json(FILES_FOLDER + '/all.json')
+    for br, kms in f_data.items():
+        for km, years in kms.items():
+            for year, events in years.items():
+                if year in YEARS:
+                    add(data, br, km, year, events)
+                    data[br][km]["coordinates"] = f_data[br][km]["coordinates"]
+    save_json(data, FILES_FOLDER + '/final.json')
 
 
 def execute():
     """Make traffic occurrence graph."""
     def make_map(nodes):
         """Build the map with events."""
-        # gmplot helper commands:
-        # https://gist.github.com/hhl60492/120362483890db9df622020eaea7c92e
         gmap = gmplot.GoogleMapPlotter(GM_LAT, GM_LEN, GM_ZOOM)
         gmap.apikey = GM_API_KEY
         for node in nodes:
             args = {
                 "title": node[0],
+                "critical": node[1]["critical"],
                 "lat": float(node[1]["lat"]),
                 "lon": float(node[1]["lon"])
             }
             gmap.marker(args.get("lat"), args.get("lon"),
-                        title=args.get("title"))
+                        title=args.get("critical"))
         gmap.draw(FILES_FOLDER + 'map.html')
 
     G = nx.Graph()
-    file_data = read_json(FILES_FOLDER + '/all.json')
-    for kms in file_data.values():
+    f_data = read_json(FILES_FOLDER + '/final.json')
+    for kms in f_data.values():
         for km, values in kms.items():
             coordinates = values.get("coordinates")
             G.add_node(km,
+                       critical=values.get("critical"),
                        lat=coordinates.get("lat"),
                        lon=coordinates.get("lon"))
     make_map(G.nodes.data())
