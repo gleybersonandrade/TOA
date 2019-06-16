@@ -4,12 +4,6 @@ The TOA is a simple strategy created to find patterns in traffic occurrences.
 
 ## Running
 
-* Generate input json files:
-
-```
-python main.py -m generate
-```
-
 * Construct file to be used by graph:
 
 ```

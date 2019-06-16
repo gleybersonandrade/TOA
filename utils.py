@@ -28,69 +28,6 @@ def read_json(path):
         return json.load(file)
 
 
-def generate():
-    """Generate files."""
-    def add(events, br, km, event):
-        """Insert an event in events dict."""
-        if br not in events:
-            events[br] = {}
-        if km not in events[br]:
-            events[br][km] = {}
-        for key in event:
-            if key not in events[br][km]:
-                events[br][km][key] = 0
-            value = events[br][km][key] + event[key]
-            events[br][km].update({key: value})
-
-    def get_data(year):
-        """Get data from CSV files."""
-        def read_csv(path):
-            """Read CSV file."""
-            with codecs.open(path, 'r', encoding="utf-8",
-                             errors="ignore") as file:
-                reader = csv.reader(file, delimiter=';')
-                header = next(reader, None)
-                lines = [line for line in reader]
-                file.close()
-            return header, lines
-
-        data = {}
-        for key, values in COLLECTIONS.items():
-            path = FILES_FOLDER + year + '/' + key
-            files = [f for f in os.listdir(path)
-                     if os.path.isfile(os.path.join(path, f))]
-            f_data = []
-            for file in files:
-                header, lines = read_csv(path + '/' + file)
-                for line in lines:
-                    document = {}
-                    for index, field in enumerate(header):
-                        if field in values:
-                            document.update({field: line[index]})
-                    f_data.append(document)
-            data[key] = f_data
-        return data
-
-    for year in YEARS:
-        events = {}
-        data = get_data(year)
-        for accident in data["accidents"]:
-            accidents = 1
-            fatal_accidents = 0
-            if int(accident["mortos"]) > 0:
-                fatal_accidents = 1
-                accidents = 0
-            event = {"accidents": accidents,
-                     "fatal_accidents": fatal_accidents}
-            add(events, re.split('[,|.]', accident["br"])[0],
-                re.split('[,|.]', accident["km"])[0], event)
-        for infraction in data["infractions"]:
-            event = {"infractions": 1}
-            add(events, re.split('[,|.]', infraction["num_br_infracao"])[0],
-                re.split('[,|.]', infraction["num_km_infracao"])[0], event)
-        save_json(events, FILES_FOLDER + year + '/out.json')
-
-
 def construct():
     """Construct file to be used in graph."""
     def add(data, br, km, year, events):
@@ -102,7 +39,7 @@ def construct():
         accidents = events.get("accidents") or 0
         deaths = events.get("deaths") or 0
         infractions = events.get("infractions") or 1
-        critical = round((3 * deaths + accidents + 0.1 * infractions), 3)
+        critical = round((25 * deaths + 5 * accidents + 0.005 * infractions), 3)
         events.update({"critical": critical})
         current_critical = data[br][km].get("critical") or 0
         data[br][km][year] = events
@@ -152,7 +89,6 @@ def execute():
 def run(method):
     """Run method."""
     switcher = {
-        "generate": lambda: generate(),
         "construct": lambda: construct(),
         "execute": lambda: execute()
     }
