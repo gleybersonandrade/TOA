@@ -2,4 +2,4 @@
 
 
 MAIN_DESC = "Traffic Occurrence Analyzer"
-METHOD_DESC = "method to be executed (populate, construct)"
+METHOD_DESC = "method to be executed (construct, execute)"
