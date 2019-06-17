@@ -1,19 +1,14 @@
 """Traffic Occurrence Analyzer utils."""
 
 # System imports
-import codecs
-import csv
 import json
-import os
-import re
 
 # Third-party imports
 import gmplot
 import networkx as nx
 
 # Local imports
-from config import (COLLECTIONS, FILES_FOLDER, GM_API_KEY, GM_LAT, GM_LEN,
-                    GM_ZOOM, YEARS)
+from config import FILES_FOLDER, GM_API_KEY, GM_LAT, GM_LEN, GM_ZOOM, YEARS
 
 
 def save_json(data, path):
@@ -39,7 +34,7 @@ def construct():
         accidents = events.get("accidents") or 0
         deaths = events.get("deaths") or 0
         infractions = events.get("infractions") or 1
-        critical = round((25 * deaths + 5 * accidents + 0.005 * infractions), 3)
+        critical = round((25*deaths + 5*accidents + 0.005*infractions), 3)
         events.update({"critical": critical})
         current_critical = data[br][km].get("critical") or 0
         data[br][km][year] = events
